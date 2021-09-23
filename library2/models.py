@@ -26,6 +26,7 @@ class Books(models.Model):
          return self.name
 
 class UserInfo(models.Model):
+    id = models.AutoField(primary_key=True)
     username = models.OneToOneField(User,on_delete = models.CASCADE)
     books_borrowed= models.ManyToManyField(Books,blank = True)
     preferences = models.ManyToManyField(Genre,blank = True)
