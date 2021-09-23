@@ -1,1 +1,1 @@
-web: gunicorn ary_amannlibraryproject.wsgi
+web: gunicorn Library.wsgi
