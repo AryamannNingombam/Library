@@ -1,0 +1,261 @@
+﻿<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/1591a0809d.js" crossorigin="anonymous"></script>
+    <title>{%block title%}{%endblock%}</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="position: sticky; top: 0;z-index: 5;">
+        <a class="navbar-brand" href="">Welcome {{user.first_name}}!</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse"></div>
+        <div class="collapse navbar-collapse" id="navbar">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <button style="margin-left: 0px;" id="home" class="nav-link rounded ">Home </button>
+                </li>
+            </ul>
+            {%if user.is_authenticated%}
+            <li class="nav-item">
+                <button class="nav-link mx-3 rounded" id="yourBooks">Your Books</button>
+            </li>
+            {%else%}
+            <li class="nav-item">
+                <button onclick="signIn()" class="nav-link mx-3 rounded" id="yourBooksNot">Your Books</button>
+            </li>
+            {%endif%}
+            <form class="form-inline my-2 my-lg-0" method='post' ac="http://127.0.0.1:8000/search">
+                <!--  -->
+            </form>
+            {%if user.is_authenticated%}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle rounded" href="#" id="drop" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{user.username}}
+                </a>
+                <div class="dropdown-menu" aria-labelledby="drop">
+                    <a class="dropdown-item" href="/logout/">Logout</a>
+                    <a class="dropdown-item" href="/settings/">Settings</a>
+                </div>
+            </li>
+            {%else%}
+            <a class="btn btn-outline-warning my-2 my-sm-0 mx-3" href="/signin/">Sign In</a>
+            <a class="btn btn-outline-info my-2 my-sm-0 mx-1" href="/signup/">Sign Up</a>
+            {%endif%}
+        </div>
+    </nav>
+    {% for message in messages%}
+    <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+        {{message}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {%endfor%}
+    {%block body%}
+    {%endblock%}
+    <footer class="footer" style="background-color: rgba(0,0,0,0.1);">
+        <div class="container" align="center">
+            <h5 style="color:#C4B4C2; text-align: center;">Stay Hungry, Stay Foolish. 
+            </h5>
+            <a target="_blank" href="https:www.instagram.com/ary_amann"> <i id='instagram' class="fa fa-instagram  mx-3 my-1"></i></a>
+            <a target="_blank" href="https://facebook.com/pro.destroyer.15"> <i id='facebook' class="fa fa-facebook-square mx-3 my-1"></i></a>
+            <a target="_blank" href="https://www.linkedin.com/in/aryamann-singh-a86240183/"> <i id='linkedin' class="fa fa-linkedin-square mx-3 my-1"></i></a>
+            <a target="_blank" href="https://twitter.com/AryamannNingom1"> <i id='twitter' class="fa fa-twitter-square mx-3 my-1"></i></a>
+        </div>
+    </footer>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    {%block js%}{%endblock%}
+    {%block css%}{%endblock%}
+    <script>
+        document.addEventListener('DOMContentLoaded',()=>{
+            let synth =  window.speechSynthesis;
+            synth.cancel();
+        })
+    // DID IT FINALLY HAHAHHAHAHAH!!!
+    if (location.href === 'http://127.0.0.1:8000/') {
+        let input = document.getElementById('searchInput');
+
+        input.addEventListener('keyup', () => {
+
+            let tempArray = [];
+            let bookNames = document.getElementsByClassName('allBooksList');
+            let userInput = input.value.toLowerCase();
+            Array.from(bookNames).forEach((book) => {
+                let bookName = String(book.id).toLowerCase();
+                if (bookName.includes(userInput)) {
+                    tempArray.push(book);
+                }
+
+
+
+            });
+            if (tempArray.length == 0) {
+                document.getElementById('nobooks').style.display = 'block';
+                Array.from(bookNames).forEach((book) => {
+                    book.parentNode.style.display = 'none';
+
+
+
+                });
+            } else if (userInput !== '') {
+                Array.from(bookNames).forEach((book) => {
+                    if (tempArray.indexOf(book) > -1) {
+                        document.getElementById('nobooks').style.display = 'none';
+                        book.parentNode.style.display = 'block';
+                    } else {
+                        book.parentNode.style.display = 'none';
+                    }
+                });
+
+
+            } else {
+                document.getElementById('nobooks').style.display = 'none';
+                Array.from(bookNames).forEach((book) => {
+                    book.parentNode.style.display = 'block';
+
+
+
+                });
+
+            }
+
+        });
+
+
+    };
+
+function speakThis(string){
+    let synth = window.speechSynthesis;
+
+
+ 
+    synth.cancel()
+  
+    let utterThis = new SpeechSynthesisUtterance(string);
+  
+ 
+    synth.speak(utterThis);
+    
+ 
+  
+
+};
+    </script>
+    <style>
+    .rounded {
+        border-radius: 3.25rem !important;
+    }
+
+    .nav-link {
+        background: none;
+        border: none;
+        color: black;
+        z-index: 2;
+
+    }
+
+    .nav-link:hover {
+        background: white;
+        border: black;
+        color: black;
+        z-index: 2;
+    }
+
+    nav li:after {
+        content: '';
+        display: block;
+        /* This will put the pseudo element on its own line. */
+        width: 0%;
+        /* Change this to whatever width you want to have before hover. */
+        padding-top: 1px;
+        /* This creates some space between the element and the border. */
+        border-bottom: 1px solid black;
+        /* This creates the border. Replace black with whatever color you want. */
+        transition: 0.5s;
+    }
+
+    nav li:hover:after {
+        width: 100%;
+    }
+    .dropdown-menu,.dropdown-item{
+        z-index: 3;
+
+    }
+
+    footer {
+        
+        
+
+
+    position:static;
+    bottom:0px;
+    width:100%;
+    margin-top: 100px;
+    margin-bottom:0px;
+
+    }
+
+    footer i {
+        margin-bottom: 2px;
+        color: #A2A29D;
+        transition: 2s;
+        transition-timing-function  : ease-out;
+
+        font-size: 40px;
+
+
+
+    }
+footer .mb-1, .my-1 {
+    margin-bottom: 0.75rem!important;
+}
+
+
+
+
+    #instagram:hover {
+        color: #CF54C7;
+        font-size: 60px;
+        transition: 1s;
+        transition-timing-function  : ease-out;
+
+
+    }
+
+    #facebook:hover {
+        color: #1B68E7;
+        font-size: 60px;
+        transition: 1s;
+        transition-timing-function  : ease-out;
+    }
+
+    #linkedin:hover {
+        color: #4481E5;
+        font-size: 60px;
+        transition: 1s;
+        transition-timing-function  : ease-out;
+    }
+
+    #twitter:hover {
+        color: #06D7FC;
+        font-size: 60px;
+        transition: 1s;
+        transition-timing-function  : ease-out;
+    }
+    </style>
+</body>
+
+</html>

@@ -1,0 +1,218 @@
+{%extends 'layout.html'%}
+{%block title%}
+Welcome {{user.first_name}}!
+{%endblock%}
+{%block body%}
+<!-- RECOMMENDED BOOKS -->
+<div id="bookList">
+    {%if user.is_authenticated%}
+    <div id="bookList1" class="carousel slide" data-ride="carousel">
+        <div align="center" class="my-1">
+            <h1>Books Recommended For You</h1>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active" align="center">
+                <div class="card" style="width: 18rem;">
+                    <img src="/media/{{recommended_books.0.image}}" class="card-img-top" alt="..." height="400px" width="300px">
+                    <div class="card-body">
+                        <h5 class="card-title">{{recommended_books.0.name}}</h5>
+                        <p class="card-text">Written by {{recommended_books.0.author}}.</p>
+                        <a href="/book/{{recommended_books.0.sno}}" class="btn btn-lg myButton rounded">Know More</a>
+                    </div>
+                </div>
+            </div>
+            {%for book in recommended_books|slice:'1:'%}
+            <div class="carousel-item" align="center">
+                <div class="card" style="width: 18rem;">
+                    <img src="/media/{{book.image}}" class="card-img-top" alt="..." height="400px" width="300px">
+                    <div class="card-body">
+                        <h5 class="card-title">{{book.name}}</h5>
+                        <p class="card-text">Written by {{book.author}}.</p>
+                        <a href="/book/{{book.sno}}" class="btn btn-lg myButton rounded">Know More</a>
+                    </div>
+                </div>
+            </div>
+            {%endfor%}
+        </div>
+        <a class="carousel-control-prev" href="#bookList1" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#bookList1" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+    <hr>
+    {%endif%}
+    <!-- ALL BOOKS -->
+    <div align="center" class="my-4 container">
+        <h1>Our Collection </h1>
+        <div align="center" class="container">
+            <input class="form-control mr-sm-2 rounded" type="search" placeholder="Search All Books" aria-label="Search" id='searchInput'>
+        </div>
+    </div>
+    <div class="container-fluid row my-5" align="center" style="margin-left: 10px;" id='mainDiv'>
+        <div align="center" id="nobooks" style="display: none" ;>
+            <h3> No Books By That Name</h3>
+        </div>
+        {%for book in books%}
+        <div class="card my-3 mx-3" style="width: 18rem;">
+            <input type="hidden" name="bookName" id='{{book.name}}' class="allBooksList">
+            <img src="/media/{{book.image}}" class="card-img-top" alt="..." height="300px" width="200px">
+            <div class="card-body">
+                <h5 class="card-title">{{book.name}}</h5>
+                <p class="card-text">Written By {{book.author}}</p>
+                <a href="/book/{{book.sno}}" class="btn btn-lg myButton rounded">Read More
+                </a>
+                {%if book.borrowed%}
+                <p>(Borrowed)</p>
+                {%endif%}
+            </div>
+        </div>
+        {%endfor%}
+    </div>
+</div>
+<!-- BORROWED LIST -->
+<!-- USER WOULD GET ACCESS TO THIS WHEN HE CLICKS THE "YOUR BOOKS" BUTTON -->
+<div id='borrowedList' style="display: none;" align="center">
+    <div class="container row" align="center">
+        {%for book in borrowed_books%}
+        <div class="card my-3 mx-3" style="width: 18rem;" id='div{{book.sno}}'>
+            <img src="/media/{{book.image}}" class="card-img-top" alt="..." height="300px" width="200px">
+            <div class="card-body">
+                <h5 class="card-title">{{book.name}}</h5>
+                <p class="card-text">Written By {{book.author}}</p>
+                <button href="#" class="btn btn-lg myButton rounded" id='return{{book.sno}}' onclick="returnBook(this.id)">Return Book</button>
+                <input type="hidden" name="csrfToken" id='csrfToken' value="{{csrf_token}}">
+            </div>
+        </div>
+        {%empty%}
+        <div align="center" class="container my-5">
+            <h1>You haven't Borrowed Any Books Yet</h1>
+            <img class="my-5" src="/media/home/sorry.jpeg" width="500px" height="500px">
+        </div>
+        {%endfor%}
+    </div>
+</div>
+{%endblock%}
+{%block js%}
+<script>
+let home = document.getElementById('home');
+let yourBooks = document.getElementById('yourBooks');
+home.addEventListener('click', () => {
+    yourBooks.parentNode.className = 'nav-item';
+    home.parentNode.className = `nav-item active`;
+    document.getElementById('borrowedList').style.display = 'none';
+    document.getElementById('bookList').style.display = 'block';
+});
+try {
+    yourBooks.addEventListener('click', () => {
+        home.parentNode.className = 'nav-item';
+        yourBooks.parentNode.className = `nav-item active`;
+        document.getElementById('bookList').style.display = 'none';
+        document.getElementById('borrowedList').style.display = 'block';
+
+
+
+    });
+} catch (e) {
+
+};
+
+
+
+function signIn() {
+
+    location.href = 'http://127.0.0.1:8000/signin';
+    alert('You need to be signed in to access this page.')
+};
+
+function returnBook(sno) {
+    sno = sno.replace('return', '');
+    let csrfToken = document.getElementById('csrfToken').value;
+    try {
+        let request = new XMLHttpRequest();
+        request.open('GET', `http://127.0.0.1:8000/return_book/${sno}`);
+        request.setRequestHeader('X-CSRFToken', csrfToken);
+
+        request.onprogress = function() {
+            let messageSuccess = document.createElement('h3');
+
+            messageSuccess.innerHTML = 'Your book has been returned';
+
+
+
+            document.getElementById(`return${sno}`).replaceWith(messageSuccess);
+            setTimeout(
+                function() {
+                    let elem = document.getElementById(`div${sno}`);
+                    elem.parentNode.removeChild(elem);
+                }, 50)
+          
+            
+           
+        };
+        request.send();
+
+
+
+
+
+    } catch (e) {
+        // statements
+        alert(e);
+    } finally {
+            setTimeout(()=>{
+              let div = Array.from(document.getElementById('borrowedList').children)[0];
+            
+            if (Array.from(div.children).length == 0) {
+                div.innerHTML = `<div class = 'container my-5' align = 'center'><h1>You haven't Borrowed Any Books Yet</h1>
+        <img class="my-5" src="/media/home/sorry.jpeg" width="500px" height="500px"><div>`;
+        speakThis('You Have Returned All Your Books.');
+            };},177)
+    }
+
+
+
+
+
+};
+</script>
+{%endblock%}
+{%block css%}
+<style>
+li {
+    list-style-type: none
+}
+
+#drop {
+    color: black;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: red;
+
+
+}
+
+.myButton {
+    background: grey;
+    color: black;
+    border: none;
+
+}
+
+.myButton:hover {
+    background: white;
+    color: black;
+    border: black;
+
+}
+
+#nobooks {
+    margin-left: 500px;
+}
+</style>
+{%endblock%}

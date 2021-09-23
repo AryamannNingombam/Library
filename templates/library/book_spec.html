@@ -1,0 +1,318 @@
+{%extends 'layout.html'%}
+{%block title%}{{book.name}}{%endblock%}
+{%block body%}
+    <input type="hidden" value="{{user.username}}" id="userUsername" />
+<div class="row container-fluid" align="center" id='main'>
+    <div class=" col-md-6  my-5 ">
+        <img src="/media/{{book.image}}" width="450px" height="500px">
+        <div class="container-fluid my-5" id='bornot'>
+            {%if book.borrowed%}
+            <h3><strong>THIS BOOK IS ALREADY BORROWED.</strong><br>Sorry For The Inconvenience.</h3>
+            {%else%}
+            {%if user.is_authenticated%}
+            <button class="rounded btn-lg" id='borrow' onclick="borrowThisBook()">Click Here To Borrow This Book</button>
+            <input type="hidden" name="csrf" value="{{csrf_token}}" id='csrf'>
+            {%else%}
+            <h3><strong>You Need To Be Signed In To Issue This Book.</strong><br></h3>
+            {%endif%}
+            {%endif%}
+            <div class="container my-5">
+                <h2>Genre : </h2>
+                {%for genre in book_genres%}
+                <h4>{{genre.name}}<br></h4>
+                {%endfor%}
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6" align="center">
+        <h1 id="bookName">{{book.name}}</h1>
+        <h4 id="author">Written By {{book.author}}</h4>
+        <p id='desc'>{{book.desc}}</p>
+        <button id="summaryBtn" class="playPause btn-lg rounded" onclick="speak();expandThis(this.id)">Listen To Summary</button>
+        <div id="repeatButtons" style="display: none;">
+            <button id="startBtn" class="playPause  rounded" onclick="speak();expandThis(this.id)">Start Again</button>
+            <button id="pauseBtn" class="playPause rounded" onclick="pause();expandThis(this.id)">Pause Summary</button>
+            <button id="resumeBtn" class="playPause rounded" onclick="resume();expandThis(this.id)">Resume</button>
+        </div>
+    </div>
+</div>
+<div class="row mx-4 my-2" >
+    <div class="col-md-12">
+        <h2>What Other Readers Have Said About This Book.(TODO)</h2>
+        <form>
+            <input type="hidden" value="{{book.sno}}" id="bookId" />
+            <input type="text" id="comment_content"/>
+            
+            {%if user.is_authenticated%}
+            <input type="hidden" value="{{csrf_token}}" id="csrf_token" />
+            <button class="btn btn-info btn-sm" id="comment_submit">Submit</button>
+            {%else%}
+            <button class="btn btn-info btn-sm" disabled>Sign-In To Submit</button>
+            {%endif%}
+        </form>
+    </div>
+
+</div>
+<div class="container" id="commentSection">
+
+    
+    <div class="row">
+        <div class="col-md-12">
+            <ul class="list-group">
+                {%for comment in comments%}
+                <li class="list-group-item">
+
+                    <p> {{comment.commenter}} : {{comment.content}}</p> 
+                </li>
+                {%endfor%}
+
+            </ul>
+        </div>
+    </div>
+    
+    
+  
+    
+</div>
+
+
+{%endblock%}
+{%block js%}
+<script>
+    document.getElementById('home').addEventListener('click', function () {
+        location.href = 'http://127.0.0.1:8000/';
+    });
+    try {
+        document.getElementById('yourBooks').style.display = 'none';
+    } catch (e) {
+        document.getElementById('yourBooksNot').style.display = 'none';
+    }
+
+    let sno = String(location.href).replace('http://127.0.0.1:8000/book/', '');
+
+    function pause() {
+        let synth = window.speechSynthesis;
+        synth.pause();
+    };
+
+    function resume() {
+        let synth = window.speechSynthesis;
+        synth.resume();
+    };
+
+
+
+    // LOGIC TO BORROW THE BOOK;
+    function borrowThisBook() {
+        let request = new XMLHttpRequest();
+        let csrfToken = document.getElementById('csrf').value;
+        try {
+            request.open('GET', `http://127.0.0.1:8000/borrow_book/${sno}`, true);
+            // request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            request.setRequestHeader("X-CSRFToken", csrfToken);
+            //
+            request.onload = () => {
+                document.getElementById('bornot').innerHTML = `<div class="spinner-border text-success" role="status">
+    <span class="sr-only">Loading...</span>
+    </div>`;
+                setTimeout(() => {
+                    document.getElementById('bornot').innerHTML = `<h3><strong>You Have Successfully Borrowed This Book.</strong></h3>`
+                    speakThis('You Have Successfully Borrowed This Book. Thank You.')
+                }, 1000);
+            };
+            request.send()
+        } catch (e) {
+            // statements
+            document.getElementById('bornot').innerHTML = `<h3><strong>There Was Some Error. Please Try Again.</strong></h3>`;
+        };
+
+
+    };
+
+
+    function signIn() {
+
+        location.href = 'http://127.0.0.1:8000/signin';
+        alert('You need to be signed in to access this page.')
+    }
+    let sumButton = document.getElementById('summaryBtn');
+
+    function speak() {
+        let desc = document.getElementById('desc').innerText;
+        let author = document.getElementById('author').innerText;
+        let name = document.getElementById('bookName').innerText;
+        speakThis(`${name}....${author}...${desc}`);
+
+
+
+
+    };
+
+    sumButton.addEventListener('click', () => {
+        sumButton.style.display = 'none';
+        document.getElementById('repeatButtons').style.display = 'inline';
+
+    });
+
+
+    function expandThis(id) {
+
+        let allButtons = document.getElementsByClassName('playPause');
+
+        Array.from(allButtons).forEach((button) => {
+            if (button.id != id) {
+                button.style.fontSize = '19px';
+                button.style.transition = '0.5s';
+            } else {
+                button.style.fontSize = '24px';
+                button.style.transition = '0.5s';
+            };
+        });
+
+
+    };
+
+
+    //SUBMITTING  A COMMENT : 
+
+    
+    try {
+        let submitButton = document.getElementById('comment_submit');
+
+        submitButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            let csrf = document.getElementById('csrf_token').value;
+            let content = document.getElementById('comment_content').value;
+            let Id = document.getElementById('bookId').value;
+
+            let request = new XMLHttpRequest();
+            request.open('POST','http://127.0.0.1:8000/comment/',true)
+            request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            request.setRequestHeader("X-CSRFToken", csrf);
+
+            request.onload = () => {
+                document.getElementById('comment_content').value = '';
+                let userUsername = document.getElementById('userUsername').value;
+                document.getElementById('commentSection').innerHTML = ` <li class="list-group-item">
+                   <p>  ${userUsername} : ${content}</p>
+                </li>` + document.getElementById('commentSection').innerHTML
+             
+            }
+            /*commenter
+    content
+    book_id*/
+
+            request.send(`content=${content}&book_id=${Id}`);
+
+        })
+    } catch{}
+
+
+</script>
+{%endblock%}
+
+
+
+
+
+{%block css%}
+<style>
+    .playPause {
+        padding: 15px;
+    }
+
+    #summaryBtn {
+        background: #4DEC15;
+        border: white;
+        color: white;
+    }
+
+    #startBtn {
+        background: #4DEC15;
+        border: white;
+        color: white;
+        font-size: 20px;
+    }
+
+    #pauseBtn {
+        background: #EB2C15;
+        border: white;
+        color: white;
+        font-size: 20px;
+    }
+
+    #resumeBtn {
+        background: #889DF0;
+        border: white;
+        color: white;
+        font-size: 20px;
+    }
+
+    #summaryBtn:hover {
+        background: #408C26;
+        border: white;
+        color: white;
+    }
+
+    #startBtn:hover {
+        background: #408C26;
+        border: white;
+        color: white;
+    }
+
+    #pauseBtn:hover {
+        background: #973A2F;
+        border: white;
+        color: white;
+    }
+
+    #resumeBtn:hover {
+        background: #1340F9;
+        border: white;
+        color: white;
+    }
+
+
+
+    li {
+        list-style-type: none;
+        color: black;
+    }
+
+    h1 {
+        margin-top: 40px;
+        font-family: Bookman;
+        font-size: 50px;
+    }
+
+    .col-md-6  p{
+        text-align: center;
+        margin-top: 10px;
+        font-size: 23px;
+        font-family: 'Oswald', sans-serif;
+    }
+
+    #borrow:hover {
+        background: yellow;
+        color: black;
+        border: green;
+    }
+
+    #borrow {
+        background: green;
+        color: white;
+        border: red;
+    }
+    #commentSection{
+        background : none;
+       border  :none;
+
+
+    }
+    .list-group-item{
+        background : none;
+        border  : none;
+    }
+</style>
+{%endblock%}

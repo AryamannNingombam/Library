@@ -1,0 +1,141 @@
+{%extends 'layout.html'%}
+{%block title%}
+Settings
+{%endblock%}
+{%block body%}
+
+
+<div class="container my-3" align="center">
+    <h1>Settings</h1>
+    <form method='post'>{%csrf_token%}
+        <div class=" container mine my-2">
+            <div class="form-group my-2  ">
+                <label for="{{form.username.id}}">{{form.username.label}} :</label>
+                <i class="fa fa-user mx-2"></i>{{form.username}}
+            </div>
+        </div>
+        <div class=" container mine my-2">
+            <div class="form-group my-2  ">
+                <label for="{{form.first_name.id}}">{{form.first_name.label}} :</label>
+                <i class="fa fa-user mx-2"></i>{{form.first_name}}
+            </div>
+        </div>
+        <div class=" container mine my-2">
+            <div class="form-group my-2  ">
+                <label for="{{form.last_name.id}}">{{form.last_name.label}} :</label>
+                <i class="fa fa-user mx-2"></i>{{form.last_name}}
+            </div>
+        </div>
+        <div class=" container mine my-2">
+            <div class="form-group my-2 ">
+                <label for="{{form.password.id}}">{{form.email.label}} :</label>
+                <i class="fa fa-envelope-o mx-2"></i>{{form.email}}
+            </div>
+        </div>
+        <div class=" container mine" style="display: block;">
+            <label for="genres">Change Genres</label>
+            <select multiple class="form-control" id="genres" name='genres'>
+                {%for genre in allgenres%}
+                
+                {%if genre in usergenres%}
+                <option selected="selected" name="{{genre.name}}" id='{{genre.name}}'>{{genre.name}}</option>
+                {%else%}
+				<option name="{{genre.name}}" id='{{genre.name}}'>{{genre.name}}</option>
+                
+
+                {%endif%}
+                {%endfor%}
+            </select>
+        </div>
+        <button type="submit" class="btn-lg my-4 rounded" id='submitSettings'>Make Changes</button>
+    </form>
+</div>
+{%endblock%}
+{%block css%}
+<style>
+    i{
+        color: white;
+    }
+li {
+    list-style-type: none;
+
+}
+
+h1 {
+    margin-top: 40px;
+    font-family: Bookman;
+    font-size: 90px;
+    color: white;
+}
+
+p {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 23px;
+    font-family: 'Oswald', sans-serif;
+}
+
+#drop {
+    color: black;
+}
+
+label {
+    font-size: 30px;
+    color: white;
+}
+
+.formstyle {
+    font-size: 25px;
+    background: none;
+    border: none;
+    color: white;
+}
+
+body {
+
+    background: url('/media/settings/settings.jpg') no-repeat center fixed;
+    background-position: 0px 0px;
+    -webkit-background-size: 100% 100%;
+    -moz-background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    background-size: 100% 100%;
+
+}
+
+.mine {
+    border-bottom: 3px solid white;
+}
+
+.container {
+    border-radius: 20px;
+
+}
+
+#submitSettings {
+    background: grey;
+    border: none;
+    color: white;
+}
+
+#submitSettings:hover {
+    background: white;
+    border: none;
+    color: grey;
+
+}
+
+#genres li {
+    padding-right: 68px;
+    color: white;
+    font-size: 20px;
+}
+</style>
+{%endblock%}
+{%block js%}
+<script>
+document.getElementById('yourBooks').style.display = 'none';
+document.getElementById('home').addEventListener('click', function() {
+    location.href = 'http://127.0.0.1:8000/';
+});
+</script>
+{%endblock%}

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+	<title>Sign In!</title>
+<style >
+
+body{
+
+background: url('/media/signin/sign_in.jpg') no-repeat center fixed;
+    background-position: 0px 0px;
+    -webkit-background-size: 100% 100%;
+    -moz-background-size: 100% 100%;
+    -o-background-size: 100% 100%;
+    background-size: 100% 100%;
+
+}
+#mainDiv{
+border-width:10px;
+border-color: white;
+margin-top: 150px;
+
+}
+h1{
+	font-size: 97px;
+	margin: 10px;
+}
+
+label{
+	color: white;
+	font-size: 40px;
+	margin: 10px;
+}
+i{
+	font-size: 20px;
+	color: white;
+	margin: 10px;
+}
+.formstyle{
+	font-size: 20px;
+	border : none;
+	background: none;
+	color: white;
+	
+}
+.mine{
+	border-bottom: 3px solid white;
+}
+.container{
+		border-radius: 20px;
+
+	}
+
+button{
+	background: none;
+	 
+	border:   solid white;
+	color: white;
+}
+button:hover{
+	background: white;
+	 
+	border:   solid black;
+	color: black;
+}
+
+</style>
+
+
+</head>
+<body>
+
+{% for message in messages%}
+<div class="alert alert-{{message.tags}}" role="alert">
+ {{message}}
+</div>
+
+
+{%endfor%}
+
+
+
+<div class="container" align="center"  id= 'mainDiv'>
+	
+<h1 style="color: white;">Sign In!</h1>
+<div class="container">
+<form method = 'post'>{%csrf_token%}
+
+<div class=" container mine">
+  <div class="form-group my-2  ">
+    <label for="{{form.username.id}}">{{form.username.label}}</label>
+    <i class="fa fa-user mx-2"></i>{{form.username}}
+    
+  </div>
+  </div>
+
+
+  <div class=" container mine">
+  <div class="form-group my-2 ">
+    <label for="{{form.password.id}}">{{form.password.label}}</label>
+    <i class="fa fa-key mx-2"></i>{{form.password}}
+  </div>
+  </div>
+  
+  <button type="submit" class="btn-lg my-4">Submit</button>
+
+
+
+
+	
+
+
+
+</form>
+<a href="/signup/">Or Sign Up If You Don't Have An Account!</a>
+<a href="">Go To Homepage</a>
+</div>
+
+
+</div>
+
+
+
+</body>
+<script src="https://kit.fontawesome.com/1591a0809d.js" crossorigin="anonymous">
+	
+</script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</html>
