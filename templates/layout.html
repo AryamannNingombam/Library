@@ -33,7 +33,8 @@
                 <button onclick="signIn()" class="nav-link mx-3 rounded" id="yourBooksNot">Your Books</button>
             </li>
             {%endif%}
-            <form class="form-inline my-2 my-lg-0" method='post' ac="http://127.0.0.1:8000/search">
+            <!-- <form class="form-inline my-2 my-lg-0" method='post' ac="http://127.0.0.1:8000/search"> -->
+            <form class="form-inline my-2 my-lg-0" method='post' ac="https://library-portal-aryamann.herokuapp.com/search">
                 <!--  -->
             </form>
             {%if user.is_authenticated%}
@@ -85,7 +86,8 @@
             synth.cancel();
         })
     // DID IT FINALLY HAHAHHAHAHAH!!!
-    if (location.href === 'http://127.0.0.1:8000/') {
+    // if (location.href === 'http://127.0.0.1:8000/' ) {
+        if (location.href === 'https://library-portal-aryamann.herokuapp.com/'){
         let input = document.getElementById('searchInput');
 
         input.addEventListener('keyup', () => {

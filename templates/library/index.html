@@ -124,7 +124,8 @@ try {
 
 function signIn() {
 
-    location.href = 'http://127.0.0.1:8000/signin';
+    // location.href = 'http://127.0.0.1:8000/signin';
+    location.href = 'https://library-portal-aryamann.herokuapp.com/signin';
     alert('You need to be signed in to access this page.')
 };
 
@@ -133,7 +134,8 @@ function returnBook(sno) {
     let csrfToken = document.getElementById('csrfToken').value;
     try {
         let request = new XMLHttpRequest();
-        request.open('GET', `http://127.0.0.1:8000/return_book/${sno}`);
+        // request.open('GET', `http://127.0.0.1:8000/return_book/${sno}`);
+        request.open('GET', `https://library-portal-aryamann.herokuapp.com/${sno}`);
         request.setRequestHeader('X-CSRFToken', csrfToken);
 
         request.onprogress = function() {
